@@ -321,7 +321,7 @@ var  xhr;  // define the global variable to process the AJAX request
 function callDivChange() {   
 	xhr = new XMLHttpRequest();
 	
-	var filename = "test.html"
+	var filename = "/home/studentuser/code/week5app/ucesncr/www/test.html"
 	
 	xhr.open("GET", filename, true);   
 	xhr.onreadystatechange = processDivChange;   

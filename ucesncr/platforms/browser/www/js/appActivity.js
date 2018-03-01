@@ -174,11 +174,11 @@ function removePosition() {
 	mymap.removeLayer(showPositionLayer);
 }
 
-/*  function trackLocation() {
+ //function trackLocation() {
 	
 	//setInterval(getLocation,3000);
 	
-	navigator.geolocation.watchPosition(function(position) {
+	/* navigator.geolocation.watchPosition(function(position) {
 		var currentLat = position.coords.latitude;
 		var currentLon = position.coords.longitude;
 		
@@ -188,9 +188,9 @@ function removePosition() {
 		{icon:testMarkerBlue}).addTo(mymap).bindPopup("You are here");
 	
 		mymap.setView([position.coords.latitude, position.coords.longitude], 16);
-	});
+	}); */
 
-} */
+//}
 
 /* function trackLocation() {
 	
@@ -272,14 +272,35 @@ function tracking() {
 	});
 } */
 
+var currentLoc;
 
 function trackLocation() {
+
+	navigator.geolocation.getCurrentPosition(onSuccess, onError, {timeout: 5000, enableAccuracy: false});
 	
-	var currentLoc;
+	function onSuccess(position) {
+		
+		lat3 = position.coords.latitude;
+		lng3 = position.coords.longitude;
+		
+		var currentLoc = {
+		"type": "Feature",
+		"properties": {
+			"name": "Start Location",
+			"popupContent": "This is the current location!"
+		},
+		"geometry": {
+			"type": "Point",
+			"coordinates": [lng3,lat3]
+		}
+		};
+	};
 	
-	setInterval((currentLoc = getCurrentLocation), 3000);
-	
-	currentLocationLayer = L.geoJson(currentLoc,
+	function onError(error) {
+		alert('code: ' + error.code + 'n' + 'message: ' + error.message + 'n');
+	}
+		
+		currentLocationLayer = L.geoJson(currentLoc,
 		{
 			//use point to layer to create the points
 			pointToLayer:function(feature,latlng)
@@ -293,32 +314,32 @@ function trackLocation() {
 }
 
 
-function getCurrentLocation() {
+
+
+
+var  xhr;  // define the global variable to process the AJAX request 
+function callDivChange() {   
+	xhr = new XMLHttpRequest();
 	
-	if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(onSuccess);
-    } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
+	var filename = "/home/studentuser/code/week5app/ucesncr/www/test.html"
 	
-	function onSuccess(position) {
-		var lat2 = position.coords.latitude;
-		var lng2 = position.coords.longitude;
-		
-		var locationJSON = {
-			"type": "Feature",
-			"properties": {
-				"name": "Start Location",
-				"popupContent": "This is the current location!"
-			},
-			"geometry": {
-				"type": "Point",
-				"coordinates": [lng2,lat2]
-			}
-		};
-		
-		return locationJSON;
-	}
-	
-	return locationJSON;
+	xhr.open("GET", filename, true);   
+	xhr.onreadystatechange = processDivChange;   
+	try {      
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");   
+	}   
+	catch (e) {   
+		// this only works in internet explorer   
+	}   
+	xhr.send(); 
+	}   
+function processDivChange() { 
+if (xhr.readyState < 4)       // while waiting response from server         
+document.getElementById('ajaxtest').innerHTML = "Loading..."; 
+ 
+    else if (xhr.readyState === 4) {       // 4 = Response from server has been completely loaded.      
+	if (xhr.status == 200 && xhr.status < 300)     
+		// http status between 200 to 299 are all successful             
+	document.getElementById('ajaxtest').innerHTML = xhr.responseText;     
+	} 
 }
