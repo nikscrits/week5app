@@ -341,3 +341,70 @@ document.getElementById('ajaxtest').innerHTML = "Loading...";
 	document.getElementById('ajaxtest').innerHTML = xhr.responseText;     
 	} 
 }
+
+
+
+
+
+
+
+
+
+// create the code to get the Earthquakes data using an XMLHttpRequest
+function getPOIs() {
+	client = new XMLHttpRequest();
+	client.open('GET','developer.cege.ucl.ac.uk:30288/getPOI');	
+	client.onreadystatechange = POIResponse; // note don't use earthquakeResponse() with brackets as that doesn't work
+	client.send();
+}
+
+function POIResponse() {
+	// this function listens out for the server to say that the data is ready - i.e. has state 4
+	if (client.readyState == 4) {
+		// once the data is ready, process the data
+		var POIData = client.responseText;
+		loadPOILayer(POIData);
+	}
+}
+	
+// convert the received data - which is text - to JSON format and add it to the map
+function loadPOILayer(POIData) {
+	alert("Loading Earthquakes");
+	
+	// convert the text to JSON
+	var POIJson = JSON.parse(POIData);
+	
+	//load the geoJSON layer using custom icons
+	var POIlayer = L.geoJson(POIJson,
+	{
+		//use point to layer to create the points
+		pointToLayer:function(feature,latlng)
+		{
+			//look at the GeoJSON file - specifically at the properties - to see the
+			//earthquake magnitude and use a different marker depending on this value
+			//also include a pop-up that shows the place value of the earthquake
+			
+			if(feature.properties.mag > 5.00) {
+				return L.marker(latlng, {icon:testMarkerDRed}).bindPopup("<b>"+"Place: "+feature.properties.place
+				+"<br>"+"Magnitude: "+feature.properties.mag+"</b>");
+			}
+			else if (feature.properties.mag > 3.00) {
+				return L.marker(latlng, {icon:testMarkerRed}).bindPopup("<b>"+"Place: "+feature.properties.place
+				+"<br>"+"Magnitude: "+feature.properties.mag+"</b>");
+
+			}
+			else if (feature.properties.mag > 1.75) {
+				return L.marker(latlng, {icon:testMarkerOrange}).bindPopup("<b>"+"Place: "+feature.properties.place
+				+"<br>"+"Magnitude: "+feature.properties.mag+"</b>");
+
+			}
+			else {
+				//magnitude is 1.75 or less
+				return L.marker(latlng, {icon:testMarkerGreen}).bindPopup("<b>"+"Place: "+feature.properties.place
+				+"<br>"+"Magnitude: "+feature.properties.mag+"</b>");;
+			}
+		},
+	}).addTo(mymap);
+	
+	mymap.fitBounds(POIlayer.getBounds());
+}
